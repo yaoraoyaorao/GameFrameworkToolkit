@@ -10,7 +10,7 @@ namespace GameFramework.Toolkit.Editor
 
             if (Directory.Exists(packagePath))
             {
-                return packagePath;
+                return $"Packages/{packageFullName}";
             }
 
             packagePath = Path.GetFullPath("Assets/..");
@@ -23,7 +23,7 @@ namespace GameFramework.Toolkit.Editor
 
                 if (Directory.Exists(packagePath + $"/Assets/{packageName}"))
                 {
-                    return $"/Assets/{packageName}";
+                    return $"Assets/{packageName}";
                 }
 
                 string[] matchingPaths = Directory.GetDirectories(packagePath, packageName, SearchOption.AllDirectories);
