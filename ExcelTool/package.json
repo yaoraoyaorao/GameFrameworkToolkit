@@ -5,7 +5,7 @@
   "description": "游戏开发工具包Excel工具",
   "unity": "2021.1",
   "dependencies": {
-    "com.rcy.gameframework-toolkit-core": "https://github.com/yaoraoyaorao/GameFrameworkToolkit.git?path=/Core"
+    "com.rcy.gameframework-toolkit-core": "https://github.com/yaoraoyaorao/GameFrameworkToolkit.git?path=/Core#v1.0.0"
   },
   "keywords": [
     "Toolkit",
