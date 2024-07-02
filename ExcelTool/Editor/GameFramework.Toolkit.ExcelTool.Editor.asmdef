@@ -1,8 +1,12 @@
 {
-    "name": "GameFramework.Toolkit.Core.Runtime",
-    "rootNamespace": "GameFramework.Toolkit",
-    "references": [],
-    "includePlatforms": [],
+    "name": "GameFramework.Toolkit.ExcelTool.Editor",
+    "rootNamespace": "GameFramework.Toolkit.Editor",
+    "references": [
+        "GUID:77f3317f37c7ef548b4ab86bff8b1ad5"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

@@ -1,7 +1,9 @@
 {
     "name": "GameFramework.Toolkit.Core.Editor",
-    "rootNamespace": "GameFramework.Toolkit.Core.Editor",
-    "references": [],
+    "rootNamespace": "GameFramework.Toolkit.Editor",
+    "references": [
+        "GUID:a804d98b5515b0b4aa50ed77ea17ee23"
+    ],
     "includePlatforms": [
         "Editor"
     ],
