@@ -1,0 +1,16 @@
+{
+  "name": "com.rcy.gameframework-toolkit-core",
+  "version": "1.0.0",
+  "displayName": "gameframework.toolkit.core",
+  "description": "游戏开发工具包核心",
+  "unity": "2021.1",
+  "dependencies": {},
+  "keywords": [
+    "Cluster",
+    "MultipleLight"
+  ],
+  "author": {
+    "name": "Rcy",
+    "email": "2280465881@qq.com"
+  }
+}
