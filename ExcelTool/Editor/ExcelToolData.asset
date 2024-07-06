@@ -12,32 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec24a775d270e7149b18eb29b10f483b, type: 3}
   m_Name: ExcelToolData
   m_EditorClassIdentifier: 
-  ExcelPath: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~
-  CSharpPath: E:/Learn/Unity/Unity2021/GameFrameworkToolkit/Assets/Scripts
-  SaveDataPath: E:/Learn/Unity/Unity2021/GameFrameworkToolkit/Assets/Data
-  NameSpace: TestData
-  ClassPrefix: DR
-  RuleIndex: 1
-  DataBuilderIndex: -1
-  ExcelList:
-  - Name: Ability.xlsx
-    FullName: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~\Ability.xlsx
-    IsSelect: 1
-  - Name: Entity.xlsx
-    FullName: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~\Entity.xlsx
-    IsSelect: 1
-  - Name: Music.xlsx
-    FullName: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~\Music.xlsx
-    IsSelect: 1
-  - Name: Scene.xlsx
-    FullName: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~\Scene.xlsx
-    IsSelect: 1
-  - Name: Sound.xlsx
-    FullName: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~\Sound.xlsx
-    IsSelect: 1
-  - Name: UIForm.xlsx
-    FullName: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~\UIForm.xlsx
-    IsSelect: 1
-  - Name: UISound.xlsx
-    FullName: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~\UISound.xlsx
-    IsSelect: 1
+  ExcelPath: /
+  CSharpPath: /
+  SaveDataPath: /
+  NameSpace: 
+  ClassPrefix: 
+  RuleIndex: 0
+  DataBuilderIndex: 0
+  ExcelList: []
