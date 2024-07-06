@@ -11,6 +11,7 @@ namespace GameFramework.Toolkit.Editor
         public string NameSpace = "";
         public string ClassPrefix = "";
         public int RuleIndex;
+        public int DataBuilderIndex;
 
         public List<ExcelItem> ExcelList = new List<ExcelItem>();
 

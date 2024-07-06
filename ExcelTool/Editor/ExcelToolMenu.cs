@@ -1,5 +1,6 @@
 using GameFramework.Toolkit.Runtime;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace GameFramework.Toolkit.Editor
         private ExcelToolData m_Data;
         private Vector2 m_ScrollView;
         private IExcelFormatBuilder m_Rule;
+        private IExcelDataBuilder[] m_DataBuilders;
         private string[] m_RuleNames;
         private string[] m_TargetDataNames;
 
@@ -28,10 +30,11 @@ namespace GameFramework.Toolkit.Editor
             m_Data = ExcelToolAsset.GetAsset;
 
             m_RuleNames = Utility.GetTypeNames(typeof(IExcelFormatBuilder), ExcelUtility.RuntimeOrEditorAssemblyNames);
-            //m_TargetDataNames = Utility.GetTypeNames(typeof(IExcelReadRule), ExcelUtility.RuntimeOrEditorAssemblyNames);
-
+            m_TargetDataNames = Utility.GetTypeNames(typeof(IExcelDataBuilder), ExcelUtility.RuntimeOrEditorAssemblyNames);
+            
             RefreshRule();
             RefreshTargetData();
+            RefreshDataBuilder();
         }
 
         private void OnDisable()
@@ -111,7 +114,7 @@ namespace GameFramework.Toolkit.Editor
                 m_Data.RuleIndex = EditorGUILayout.Popup(m_Data.RuleIndex, m_RuleNames, EditorStyles.toolbarDropDown, GUILayout.Width(200));
 
                 EditorGUILayout.LabelField("目标数据：", GUILayout.Width(60));
-                EditorGUILayout.Popup(0, new string[] { "<None>" }, EditorStyles.toolbarDropDown, GUILayout.Width(200));
+                m_Data.DataBuilderIndex = EditorGUILayout.MaskField(m_Data.DataBuilderIndex, m_TargetDataNames, EditorStyles.toolbarDropDown, GUILayout.Width(200));
             }
 
             EditorGUILayout.Space(10);
@@ -278,6 +281,39 @@ namespace GameFramework.Toolkit.Editor
         }
 
         /// <summary>
+        /// 刷新数据构建器
+        /// </summary>
+        private void RefreshDataBuilder()
+        {
+            if(m_TargetDataNames == null || m_TargetDataNames.Length == 0)
+            {
+                m_DataBuilders = null;
+                return;
+            }
+            List<IExcelDataBuilder> datas = new List<IExcelDataBuilder>();
+            for (int i = 0; i < m_TargetDataNames.Length; i++)
+            {
+                if ((m_Data.DataBuilderIndex & (1 << i)) != 0)
+                {
+                    if (m_TargetDataNames[i] != "<None>")
+                    {
+                        Type type = AssemblyUtility.GetType(m_TargetDataNames[i]);
+                        datas.Add((IExcelDataBuilder)Activator.CreateInstance(type));
+                    }
+                }
+            }
+
+            if (datas.Count > 0)
+            {
+                m_DataBuilders = datas.ToArray();
+
+                return;
+            }
+
+            m_DataBuilders = null;
+        }
+
+        /// <summary>
         /// 刷新目标数据
         /// </summary>
         private void RefreshTargetData()
@@ -312,10 +348,7 @@ namespace GameFramework.Toolkit.Editor
             bool ok = EditorUtility.DisplayDialog("提示", "确定要转换当前文件吗？", "确定", "取消");
             if (ok)
             {
-                ExcelUtility.Read(path, m_Rule, new IExcelDataBuilder[]
-                {
-                    new BinaryDataBuilder()
-                });
+                ExcelUtility.Read(path, m_Rule, m_DataBuilders);
             }
         }
 
@@ -330,10 +363,7 @@ namespace GameFramework.Toolkit.Editor
                 foreach (var excelItem in m_Data.GetSelectItem())
                 {
                     Debug.Log(excelItem.Name);
-                    ExcelUtility.Read(excelItem.FullName, m_Rule, new IExcelDataBuilder[]
-                    {
-                        new BinaryDataBuilder()
-                    });
+                    ExcelUtility.Read(excelItem.FullName, m_Rule, m_DataBuilders);
                 }
             }
         }
@@ -350,6 +380,10 @@ namespace GameFramework.Toolkit.Editor
             }
         }
 
+        /// <summary>
+        /// 检查数据
+        /// </summary>
+        /// <returns></returns>
         private bool CheckData()
         {
             if (m_Data == null)

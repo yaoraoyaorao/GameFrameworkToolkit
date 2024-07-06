@@ -2,6 +2,7 @@ using GameFramework.Toolkit.Runtime;
 using System;
 using System.IO;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 
 namespace GameFramework.Toolkit.Editor
@@ -18,6 +19,10 @@ namespace GameFramework.Toolkit.Editor
             m_Processor = dataTableProcessor;
             m_DataProcessor = m_Processor.DataProcessors;
             outputFileName = m_Data.SaveDataPath + "/" + m_Data.ClassPrefix + dataTableProcessor.DataTableName + ".bytes";
+            if (File.Exists(outputFileName))
+            {
+                File.Delete(outputFileName);
+            }
             try
             {
                 using (FileStream fileStream = new FileStream(outputFileName, FileMode.Create, FileAccess.Write))
@@ -39,6 +44,8 @@ namespace GameFramework.Toolkit.Editor
                 }
 
                 Debug.Log(string.Format("成功解析数据表'{0}'", outputFileName));
+
+                AssetDatabase.Refresh();
             }
             catch (Exception e)
             {

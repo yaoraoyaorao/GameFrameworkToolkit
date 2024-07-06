@@ -18,6 +18,7 @@ MonoBehaviour:
   NameSpace: TestData
   ClassPrefix: DR
   RuleIndex: 1
+  DataBuilderIndex: -1
   ExcelList:
   - Name: Ability.xlsx
     FullName: E:/Learn/Unity/Unity2021/EndlessBattle/Assets/GameMain/Other/Excel~\Ability.xlsx
