@@ -15,6 +15,10 @@ namespace GameFramework.Toolkit.Editor
         public static Texture2D rule;
         public static Texture2D csharp;
         public static Texture2D prohibit;
+        public static Texture2D selectAll;
+        public static Texture2D disselectAll;
+        public static Texture2D invertSelect;
+        public static Texture2D data;
 
         static ExcelToolStyles()
         {
@@ -33,6 +37,10 @@ namespace GameFramework.Toolkit.Editor
             rule = EditorGUIUtility.Load(ExcelUtility.GetIconPath("rule.png")) as Texture2D;
             csharp = EditorGUIUtility.Load(ExcelUtility.GetIconPath("csharp.png")) as Texture2D;
             prohibit = EditorGUIUtility.Load(ExcelUtility.GetIconPath("prohibit.png")) as Texture2D;
+            selectAll = EditorGUIUtility.Load(ExcelUtility.GetIconPath("selectAll.png")) as Texture2D;
+            disselectAll = EditorGUIUtility.Load(ExcelUtility.GetIconPath("disselectAll.png")) as Texture2D;
+            invertSelect = EditorGUIUtility.Load(ExcelUtility.GetIconPath("invertSelect.png")) as Texture2D;
+            data = EditorGUIUtility.Load(ExcelUtility.GetIconPath("data.png")) as Texture2D;
 
         }
     }

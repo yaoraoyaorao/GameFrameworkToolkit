@@ -1,6 +1,6 @@
 {
     "name": "GameFramework.Toolkit.Core.Runtime",
-    "rootNamespace": "GameFramework.Toolkit",
+    "rootNamespace": "GameFramework.Toolkit.Core.Runtime",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,3 +1,4 @@
+using GameFramework.Toolkit.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -8,11 +9,14 @@ namespace GameFramework.Toolkit.Editor
     {
         private static readonly string[] RuntimeAssemblyNames =
         {
+            "GameFramework.Toolkit.Runtime",
             "Assembly-CSharp",
         };
 
         private static readonly string[] RuntimeOrEditorAssemblyNames =
         {
+            "GameFramework.Toolkit.Runtime",
+            "GameFramework.Toolkit.Editor",
             "Assembly-CSharp",
             "Assembly-CSharp-Editor",
         };
@@ -27,6 +31,11 @@ namespace GameFramework.Toolkit.Editor
             return GetTypeNames(typeBase, RuntimeAssemblyNames);
         }
 
+        /// <summary>
+        /// 获取指定基类的所有子类的名称。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static string GetConfigurationPath<T>() where T : Attribute
         {
             foreach (System.Type type in AssemblyUtility.GetTypes())
@@ -67,6 +76,12 @@ namespace GameFramework.Toolkit.Editor
             return GetTypeNames(typeBase, RuntimeOrEditorAssemblyNames);
         }
 
+        /// <summary>
+        /// 获取指定基类的所有子类的名称。
+        /// </summary>
+        /// <param name="typeBase"></param>
+        /// <param name="assemblyNames"></param>
+        /// <returns></returns>
         public static string[] GetTypeNames(System.Type typeBase, string[] assemblyNames)
         {
             List<string> typeNames = new List<string>();

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GameFramework.Toolkit
+namespace GameFramework.Toolkit.Runtime
 {
     public static class AssemblyUtility
     {

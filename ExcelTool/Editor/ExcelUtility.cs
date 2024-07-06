@@ -1,60 +1,101 @@
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.IO;
+using UnityEngine;
 
 namespace GameFramework.Toolkit.Editor
 {
     public static class ExcelUtility
     {
+        public static readonly string[] RuntimeOrEditorAssemblyNames =
+        {
+            "GameFramework.Toolkit.Editor",
+            "GameFramework.Toolkit.Runtime",
+            "GameFramework.Toolkit.ExcelTool.Editor",
+            "GameFramework.Toolkit.ExcelTool.Runtime",
+            "Assembly-CSharp",
+            "Assembly-CSharp-Editor",
+        };
+
         public const string PackageFullName = "com.rcy.gameframework-toolkit-exceltool";
         public const string PackageDisplayName = "ExcelTool";
 
-        public static void Read(string path, IExcelReadRule readRule)
+        /// <summary>
+        /// 读取Excel文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="readRule"></param>
+        public static void Read(string path, IExcelFormatBuilder readRule, IExcelDataBuilder[] dataBuilders)
         {
-            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read)) 
+            if (!File.Exists(path))
             {
-                IWorkbook workbook = new XSSFWorkbook(stream);
+                Debug.LogError("Excel Error:Excel文件不存在");
+                return;
+            }
 
-                ISheet sheet = workbook.GetSheetAt(0);
+            if (readRule == null)
+            {
+                Debug.LogError("Excel Error:生成规则为空");
+                return;
+            }
 
-                for (int i = 0; i <= sheet.LastRowNum; i++)
+            try
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
                 {
-                    IRow row = sheet.GetRow(i);
+                    IWorkbook workbook = new XSSFWorkbook(stream);
 
-                    if (row == null)
+                    for (int i = 0; i < workbook.NumberOfSheets; i++)
                     {
-                        continue;
-                    }
+                        ISheet sheet = workbook.GetSheetAt(i);
 
-                    if (!readRule.RowRule(row))
-                    {
-                        continue;
-                    }
+                        if (sheet == null) continue;
 
-                    for (int j = 0; j < row.LastCellNum; j++)
-                    {
-                        ICell cell = row.GetCell(j);
+                        int rowCount = sheet.LastRowNum + 1;
+                        string sheetName = sheet.SheetName;
+                        string[][] data = new string[rowCount][];
 
-                        if (cell == null)
+                        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
                         {
-                            continue;
+                            IRow row = sheet.GetRow(rowIndex);
+                            if (row == null) continue;
+
+                            int cellCount = row.LastCellNum;
+                            data[rowIndex] = new string[cellCount];
+
+                            for (int cellIndex = 0; cellIndex < cellCount; cellIndex++)
+                            {
+                                ICell cell = row.GetCell(cellIndex);
+                                data[rowIndex][cellIndex] = cell != null ? cell.ToString() : "";
+                            }
                         }
 
-                        if (!readRule.CellRule(cell))
-                        {
-                            continue;
-                        }
-                        
+                        readRule.FormateBuilder(sheetName, data, dataBuilders);
                     }
                 }
             }
+            catch (System.Exception e)
+            {
+
+                Debug.LogError("Excel Error:" + e.Message);
+            }
+           
         }
 
+        /// <summary>
+        /// 获取插件的相对路径
+        /// </summary>
+        /// <returns></returns>
         public static string GetPath()
         {
             return Utility.GetPackageRelativePath(PackageFullName, PackageDisplayName);
         }
 
+        /// <summary>
+        /// 获取插件的图标路径
+        /// </summary>
+        /// <param name="iconName"></param>
+        /// <returns></returns>
         public static string GetIconPath(string iconName)
         {
             return Path.Combine(GetPath(), "Editor/Icons", iconName);

@@ -2,7 +2,8 @@
     "name": "GameFramework.Toolkit.ExcelTool.Editor",
     "rootNamespace": "GameFramework.Toolkit.Editor",
     "references": [
-        "GUID:77f3317f37c7ef548b4ab86bff8b1ad5"
+        "GUID:77f3317f37c7ef548b4ab86bff8b1ad5",
+        "GUID:a804d98b5515b0b4aa50ed77ea17ee23"
     ],
     "includePlatforms": [
         "Editor"

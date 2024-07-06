@@ -1,3 +1,5 @@
+using GameFramework.Toolkit.Runtime;
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -8,40 +10,36 @@ namespace GameFramework.Toolkit.Editor
     {
         private ExcelToolData m_Data;
         private Vector2 m_ScrollView;
-        private IExcelReadRule m_Rule;
-        
-        private const string key = "GameFramework.Toolkit.Editor.ExcelToolData";
+        private IExcelFormatBuilder m_Rule;
+        private string[] m_RuleNames;
+        private string[] m_TargetDataNames;
 
-        [MenuItem("GameFramework/ExcelToolMenu")]
+
+        [MenuItem("GameFramework/Excel工具")]
         public static void ShowExample()
         {
             ExcelToolMenu wnd = GetWindow<ExcelToolMenu>();
             wnd.titleContent = new GUIContent("ExcelToolMenu");
+            wnd.minSize = new Vector2(800, 420);
         }
 
         private void OnEnable()
         {
-            string url = ExcelUtility.GetPath() + "/Editor/ExcelToolData.asset";
+            m_Data = ExcelToolAsset.GetAsset;
 
-            m_Data = AssetDatabase.LoadAssetAtPath<ExcelToolData>(url);
+            m_RuleNames = Utility.GetTypeNames(typeof(IExcelFormatBuilder), ExcelUtility.RuntimeOrEditorAssemblyNames);
+            //m_TargetDataNames = Utility.GetTypeNames(typeof(IExcelReadRule), ExcelUtility.RuntimeOrEditorAssemblyNames);
 
-            if (m_Data == null)
-            {
-
-                m_Data = CreateInstance<ExcelToolData>();
-                AssetDatabase.CreateAsset(m_Data, url);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
-
-            m_Rule = new DefaultRule();
+            RefreshRule();
+            RefreshTargetData();
         }
 
         private void OnDisable()
         {
-            string jsonStr = JsonUtility.ToJson(m_Data);
-
-            EditorPrefs.SetString(key, jsonStr);
+            if (m_Data != null)
+            {
+                EditorUtility.SetDirty(m_Data);
+            }
         }
 
         private void OnGUI()
@@ -53,20 +51,15 @@ namespace GameFramework.Toolkit.Editor
 
             using (new EditorGUILayout.HorizontalScope("toolbar"))
             {
+               
+                EditorGUILayout.LabelField("Excel总路径*", GUILayout.Width(70));
+                GUI.enabled = false;
+                EditorGUILayout.TextField(m_Data.ExcelPath);
+                GUI.enabled = true;
+
                 if (GUILayout.Button(new GUIContent(ExcelToolStyles.importExcel, "导入Excel总目录"), EditorStyles.toolbarButton, GUILayout.Width(50)))
                 {
                     SelectPath();
-                }
-
-                EditorGUILayout.LabelField("Excel总路径", GUILayout.Width(70));
-
-                GUI.enabled = false;
-                EditorGUILayout.TextField(m_Data.m_ExcelPath);
-                GUI.enabled = true;
-
-                if (GUILayout.Button(new GUIContent(ExcelToolStyles.allConvert, "转换当前所有Excel"), EditorStyles.toolbarButton, GUILayout.Width(50)))
-                {
-                    ConvertAll();
                 }
 
                 if (GUILayout.Button(new GUIContent(ExcelToolStyles.refresh, "重新导入Excel"), EditorStyles.toolbarButton, GUILayout.Width(50)))
@@ -77,41 +70,147 @@ namespace GameFramework.Toolkit.Editor
 
             using (new EditorGUILayout.HorizontalScope("toolbar"))
             {
-                if (GUILayout.Button(new GUIContent(ExcelToolStyles.csharp, "设置C#代码目录"), EditorStyles.toolbarButton, GUILayout.Width(50)))
-                {
-
-                }
-
-                EditorGUILayout.LabelField("代码路径", GUILayout.Width(70));
+                EditorGUILayout.LabelField("代码路径*", GUILayout.Width(70));
 
                 GUI.enabled = false;
-                EditorGUILayout.TextField(m_Data.m_CSharpPath);
+                EditorGUILayout.TextField(m_Data.CSharpPath);
                 GUI.enabled = true;
 
-                
+                if (GUILayout.Button(new GUIContent(ExcelToolStyles.csharp, "设置C#代码目录"), EditorStyles.toolbarButton, GUILayout.Width(50)))
+                {
+                    m_Data.CSharpPath = OpenFolderPanel(m_Data.CSharpPath, "选择C#代码文件夹");
+                }
             }
 
             using (new EditorGUILayout.HorizontalScope("toolbar"))
             {
-                EditorGUILayout.LabelField("筛选规则：", GUILayout.Width(60));
-                EditorGUILayout.Popup(0, new string[] { "<None>" }, EditorStyles.toolbarDropDown, GUILayout.Width(200));
+                EditorGUILayout.LabelField("数据路径*", GUILayout.Width(70));
+
+                GUI.enabled = false;
+                EditorGUILayout.TextField(m_Data.SaveDataPath);
+                GUI.enabled = true;
+
+                if (GUILayout.Button(new GUIContent(ExcelToolStyles.data, "设置数据目录"), EditorStyles.toolbarButton, GUILayout.Width(50)))
+                {
+                    m_Data.SaveDataPath = OpenFolderPanel(m_Data.SaveDataPath, "选择C#代码文件夹");
+                }
+            }
+
+            using (new EditorGUILayout.HorizontalScope("toolbar"))
+            {
+                EditorGUILayout.LabelField("命名空间*", GUILayout.Width(70));
+                m_Data.NameSpace = EditorGUILayout.TextField(m_Data.NameSpace, GUILayout.Width(100));
+
+                EditorGUILayout.LabelField("类前缀", GUILayout.Width(70));
+                m_Data.ClassPrefix = EditorGUILayout.TextField(m_Data.ClassPrefix, GUILayout.Width(100));
+            }
+
+            using (new EditorGUILayout.HorizontalScope("toolbar"))
+            {
+                EditorGUILayout.LabelField("生成规则：", GUILayout.Width(60));
+                m_Data.RuleIndex = EditorGUILayout.Popup(m_Data.RuleIndex, m_RuleNames, EditorStyles.toolbarDropDown, GUILayout.Width(200));
 
                 EditorGUILayout.LabelField("目标数据：", GUILayout.Width(60));
                 EditorGUILayout.Popup(0, new string[] { "<None>" }, EditorStyles.toolbarDropDown, GUILayout.Width(200));
             }
 
-
-
             EditorGUILayout.Space(10);
 
-            using (new EditorGUILayout.VerticalScope(GUILayout.Height(250)))
+            using (new EditorGUILayout.VerticalScope(GUILayout.MinHeight(250)))
             {
                 m_ScrollView = EditorGUILayout.BeginScrollView(m_ScrollView,"framebox");
                 DrawList();
                 EditorGUILayout.EndScrollView();
             }
 
+            using (new EditorGUILayout.HorizontalScope("toolbar"))
+            {
+                if (GUILayout.Button(new GUIContent(ExcelToolStyles.selectAll, "全选"), EditorStyles.toolbarButton, GUILayout.Width(50)))
+                {
+                    m_Data.SelectAll();
+                }
 
+                if (GUILayout.Button(new GUIContent(ExcelToolStyles.disselectAll, "全不选"), EditorStyles.toolbarButton, GUILayout.Width(50)))
+                {
+                    m_Data.DisSelectAll();
+                }
+
+                if (GUILayout.Button(new GUIContent(ExcelToolStyles.invertSelect, "反选"), EditorStyles.toolbarButton, GUILayout.Width(50)))
+                {
+                    m_Data.InvertSelect();
+                }
+
+                using (new EditorGUI.DisabledGroupScope(m_Data.SelectCount == 0))
+                {
+                    if (GUILayout.Button(new GUIContent(ExcelToolStyles.allConvert, "转换当前所选Excel"), EditorStyles.toolbarButton, GUILayout.Width(50)))
+                    {
+                        ConvertSelectAll();
+                    }
+
+                    if (GUILayout.Button(new GUIContent(ExcelToolStyles.remove, "移除当前所选Excel"), EditorStyles.toolbarButton, GUILayout.Width(50)))
+                    {
+                        RemoveSelectAll();
+                    }
+
+                    EditorGUILayout.LabelField($"所选数:{m_Data.SelectCount}", GUILayout.Width(70));
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// 绘制列表
+        /// </summary>
+        private void DrawList()
+        {
+            if (m_Data.ExcelList == null)
+                return;
+
+            if (!Directory.Exists(m_Data.ExcelPath))
+            {
+                EditorGUILayout.HelpBox("Excel文件夹不存在", MessageType.Error);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(m_Data.ExcelPath) || m_Data.ExcelPath == "/")
+            {
+                return;
+            }
+
+            if (m_Data.ExcelList.Count == 0)
+            {
+                EditorGUILayout.HelpBox("Excel文件不存在", MessageType.Warning);
+                return;
+            }
+            ExcelItem excelItem = null;
+            for (int i = 0; i < m_Data.ExcelList.Count; i++)
+            {
+                using (new EditorGUILayout.HorizontalScope("GroupBox"))
+                {
+                    excelItem = m_Data.ExcelList[i];
+                    string path = excelItem.FullName;
+                    string name = excelItem.Name;
+
+                    excelItem.IsSelect = EditorGUILayout.Toggle(excelItem.IsSelect, GUILayout.Width(30));
+                    EditorGUILayout.LabelField(name, EditorStyles.boldLabel, GUILayout.Width(100));
+                    EditorGUILayout.LabelField(path);
+
+                    if (GUILayout.Button(new GUIContent(ExcelToolStyles.convert, "转换当前Excel"), EditorStyles.iconButton, GUILayout.Width(35)))
+                    {
+                        ConvertSingle(path);
+                    }
+
+                    if (GUILayout.Button(new GUIContent(ExcelToolStyles.open, "打开当前Excel"), EditorStyles.iconButton, GUILayout.Width(35)))
+                    {
+                        OpenFile(path);
+                    }
+
+                    if (GUILayout.Button(new GUIContent(ExcelToolStyles.remove, "移除当前Excel"), EditorStyles.iconButton, GUILayout.Width(35)))
+                    {
+                        m_Data.ExcelList.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -119,9 +218,20 @@ namespace GameFramework.Toolkit.Editor
         /// </summary>
         private void SelectPath()
         {
-            m_Data.m_ExcelPath = EditorUtility.OpenFolderPanel("选择Excel文件夹", "", "");
+            m_Data.ExcelPath = OpenFolderPanel(m_Data.ExcelPath,"选择Excel文件夹");
 
             RefreshList();
+        }
+
+        private string OpenFolderPanel(string rawPath,string title)
+        {
+            string path = EditorUtility.OpenFolderPanel(title, rawPath, "");
+            if(string.IsNullOrEmpty(path))
+            {
+                return rawPath;
+            }
+
+            return path;
         }
 
         /// <summary>
@@ -129,25 +239,56 @@ namespace GameFramework.Toolkit.Editor
         /// </summary>
         private void RefreshList()
         {
-            if (string.IsNullOrEmpty(m_Data.m_ExcelPath) || m_Data.m_ExcelPath == "/")
+            if (string.IsNullOrEmpty(m_Data.ExcelPath) || m_Data.ExcelPath == "/")
             {
                 return;
             }
 
-            m_Data.m_ExcelList.Clear();
+            m_Data.ExcelList.Clear();
 
-            string[] excelFiles = Directory.GetFiles(m_Data.m_ExcelPath, "*.xlsx", SearchOption.AllDirectories);
+            string[] excelFiles = Directory.GetFiles(m_Data.ExcelPath, "*.xlsx", SearchOption.AllDirectories);
 
             foreach (var item in excelFiles)
             {
-                m_Data.m_ExcelList.Add(item);
+                m_Data.ExcelList.Add(new ExcelItem()
+                {
+                    Name = Path.GetFileName(item),
+                    FullName = item
+                });
             }
+        }
+
+        /// <summary>
+        /// 刷新规则
+        /// </summary>
+        private void RefreshRule()
+        {
+            if (m_Data.RuleIndex > m_RuleNames.Length - 1)
+            {
+                m_Data.RuleIndex = 0;
+            }
+
+            string ruleType = m_RuleNames[m_Data.RuleIndex];
+
+            if (ruleType != "<None>")
+            {
+                Type type = AssemblyUtility.GetType(ruleType);
+                m_Rule = (IExcelFormatBuilder)Activator.CreateInstance(type);
+            }
+        }
+
+        /// <summary>
+        /// 刷新目标数据
+        /// </summary>
+        private void RefreshTargetData()
+        {
+
         }
 
         /// <summary>
         /// 打开Excel文件
         /// </summary>
-        private void OpenExcelFile(string path)
+        private void OpenFile(string path)
         {
             if (!File.Exists(path))
             {
@@ -158,67 +299,85 @@ namespace GameFramework.Toolkit.Editor
         }
 
         /// <summary>
-        /// 绘制列表
+        /// 转换单个Excel文件
         /// </summary>
-        private void DrawList()
+        /// <param name="path"></param>
+        private void ConvertSingle(string path)
         {
-            if (m_Data.m_ExcelList == null)
-                return;
-
-            if (!Directory.Exists(m_Data.m_ExcelPath))
-            {
-                EditorGUILayout.HelpBox("Excel文件夹不存在", MessageType.Error);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(m_Data.m_ExcelPath) || m_Data.m_ExcelPath == "/")
+            if(!CheckData())
             {
                 return;
             }
 
-            if (m_Data.m_ExcelList.Count == 0)
+            bool ok = EditorUtility.DisplayDialog("提示", "确定要转换当前文件吗？", "确定", "取消");
+            if (ok)
             {
-                EditorGUILayout.HelpBox("Excel文件不存在", MessageType.Warning);
-                return;
-            }
-
-            for (int i = 0; i < m_Data.m_ExcelList.Count; i++)
-            {
-                using (new EditorGUILayout.HorizontalScope())
+                ExcelUtility.Read(path, m_Rule, new IExcelDataBuilder[]
                 {
-                    string path = m_Data.m_ExcelList[i];
+                    new BinaryDataBuilder()
+                });
+            }
+        }
 
-                    EditorGUILayout.LabelField(path);
-
-                    if (GUILayout.Button(new GUIContent(ExcelToolStyles.convert,"转换当前Excel"), EditorStyles.iconButton, GUILayout.Width(35)))
+        /// <summary>
+        /// 转换Excel文件
+        /// </summary>
+        private void ConvertSelectAll()
+        {
+            bool ok = EditorUtility.DisplayDialog("提示", "确定要转换当前所选文件吗？", "确定", "取消");
+            if (ok)
+            {
+                foreach (var excelItem in m_Data.GetSelectItem())
+                {
+                    Debug.Log(excelItem.Name);
+                    ExcelUtility.Read(excelItem.FullName, m_Rule, new IExcelDataBuilder[]
                     {
-                        ConvertSingle(path);
-                    }
-
-                    if (GUILayout.Button(new GUIContent(ExcelToolStyles.open,"打开当前Excel"), EditorStyles.iconButton, GUILayout.Width(35)))
-                    {
-                        OpenExcelFile(path);
-                    }
-
-                    if (GUILayout.Button(new GUIContent(ExcelToolStyles.remove,"移除当前Excel"), EditorStyles.iconButton, GUILayout.Width(35)))
-                    {
-                        m_Data.m_ExcelList.RemoveAt(i);
-                    }
+                        new BinaryDataBuilder()
+                    });
                 }
             }
         }
 
         /// <summary>
-        /// 转换所有Excel文件
+        /// 移除所选Excel文件
         /// </summary>
-        private void ConvertAll()
+        private void RemoveSelectAll()
         {
-
+            bool ok = EditorUtility.DisplayDialog("警告", "确定要移除所选Excel文件吗？", "确定", "取消");
+            if (ok)
+            {
+                m_Data.RemoveSelect();
+            }
         }
 
-        private void ConvertSingle(string path)
+        private bool CheckData()
         {
-            ExcelUtility.Read(path, m_Rule);
+            if (m_Data == null)
+            {
+                Debug.LogError("数据不能为空");
+
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(m_Data.NameSpace))
+            {
+                Debug.LogError("命名空间不能为空");
+                return false;
+            }
+
+            if (!Directory.Exists(m_Data.SaveDataPath))
+            {
+                Debug.LogError("存储数据文件夹不存在");
+                return false;
+            }
+
+            if (!Directory.Exists(m_Data.CSharpPath))
+            {
+                Debug.LogError("存储代码文件夹不存在");
+                return false;
+            }
+
+            return true;
         }
     }
 }

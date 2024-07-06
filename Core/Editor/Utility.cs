@@ -1,9 +1,17 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace GameFramework.Toolkit.Editor
 {
     public static class Utility
     {
+        /// <summary>
+        /// 获取包相对路径
+        /// </summary>
+        /// <param name="packageFullName"></param>
+        /// <param name="packageName"></param>
+        /// <returns></returns>
         public static string GetPackageRelativePath(string packageFullName, string packageName)
         {
             string packagePath = Path.GetFullPath($"Packages/{packageFullName}");
@@ -68,6 +76,23 @@ namespace GameFramework.Toolkit.Editor
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// 获取类型名称组
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string[] GetTypeNames(Type type,string[] assemblyNames)
+        {
+            List<string> typeNames = new List<string>
+            {
+                "<None>"
+            };
+
+            typeNames.AddRange(TypeUtility.GetTypeNames(type, assemblyNames));
+
+            return typeNames.ToArray();
         }
 
         private static string ValidateLocation(string[] paths, string projectPath)
