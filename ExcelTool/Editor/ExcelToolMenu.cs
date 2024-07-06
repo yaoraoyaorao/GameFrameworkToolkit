@@ -275,7 +275,7 @@ namespace GameFramework.Toolkit.Editor
 
             if (ruleType != "<None>")
             {
-                Type type = AssemblyUtility.GetType(ruleType);
+                Type type = Type.GetType(ruleType);
                 m_Rule = (IExcelFormatBuilder)Activator.CreateInstance(type);
             }
         }
