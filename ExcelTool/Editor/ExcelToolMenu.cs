@@ -266,16 +266,17 @@ namespace GameFramework.Toolkit.Editor
         /// </summary>
         private void RefreshRule()
         {
-            if (m_Data.RuleIndex > m_RuleNames.Length - 1)
+            if (m_RuleNames == null || m_RuleNames.Length == 1)
             {
-                m_Data.RuleIndex = 0;
+                m_Rule = null;
+                return;
             }
 
             string ruleType = m_RuleNames[m_Data.RuleIndex];
 
             if (ruleType != "<None>")
             {
-                Type type = Type.GetType(ruleType);
+                Type type = AssemblyUtility.GetType(ruleType);
                 m_Rule = (IExcelFormatBuilder)Activator.CreateInstance(type);
             }
         }
@@ -340,15 +341,10 @@ namespace GameFramework.Toolkit.Editor
         /// <param name="path"></param>
         private void ConvertSingle(string path)
         {
-            if(!CheckData())
-            {
-                return;
-            }
-
             bool ok = EditorUtility.DisplayDialog("提示", "确定要转换当前文件吗？", "确定", "取消");
             if (ok)
             {
-                ExcelUtility.Read(path, m_Rule, m_DataBuilders);
+                Convert(path);
             }
         }
 
@@ -362,10 +358,27 @@ namespace GameFramework.Toolkit.Editor
             {
                 foreach (var excelItem in m_Data.GetSelectItem())
                 {
-                    Debug.Log(excelItem.Name);
-                    ExcelUtility.Read(excelItem.FullName, m_Rule, m_DataBuilders);
+                    Convert(excelItem.FullName);
                 }
             }
+        }
+
+        private void Convert(string path)
+        {
+            if (!CheckData())
+            {
+                return;
+            }
+
+            RefreshRule();
+            RefreshDataBuilder();
+
+            if (m_Rule == null || m_DataBuilders == null)
+            {
+                return;
+            }
+
+            ExcelUtility.Read(path, m_Rule, m_DataBuilders);
         }
 
         /// <summary>
