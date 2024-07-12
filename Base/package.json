@@ -1,0 +1,16 @@
+{
+  "name": "com.rcy.gameframework-toolkit-base",
+  "version": "1.0.0",
+  "displayName": "Gameframework Toolkit Base",
+  "description": "游戏开发工具包Base工具",
+  "unity": "2021.1",
+  "dependencies": {},
+  "keywords": [
+    "Toolkit",
+    "Base"
+  ],
+  "author": {
+    "name": "Rcy",
+    "email": "2280465881@qq.com"
+  }
+}
