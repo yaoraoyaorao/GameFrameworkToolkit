@@ -17,6 +17,6 @@ MonoBehaviour:
   SaveDataPath: /
   NameSpace: 
   ClassPrefix: 
-  RuleIndex: 0
-  DataBuilderIndex: 0
+  RuleIndex: 1
+  DataBuilderIndex: 2
   ExcelList: []

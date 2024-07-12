@@ -113,7 +113,7 @@ namespace GameFramework.Toolkit.Editor
                 EditorGUILayout.LabelField("生成规则：", GUILayout.Width(60));
                 m_Data.RuleIndex = EditorGUILayout.Popup(m_Data.RuleIndex, m_RuleNames, EditorStyles.toolbarDropDown, GUILayout.Width(200));
 
-                EditorGUILayout.LabelField("目标数据：", GUILayout.Width(60));
+                EditorGUILayout.LabelField("数据构建器：", GUILayout.Width(65));
                 m_Data.DataBuilderIndex = EditorGUILayout.MaskField(m_Data.DataBuilderIndex, m_TargetDataNames, EditorStyles.toolbarDropDown, GUILayout.Width(200));
             }
 
@@ -373,8 +373,15 @@ namespace GameFramework.Toolkit.Editor
             RefreshRule();
             RefreshDataBuilder();
 
-            if (m_Rule == null || m_DataBuilders == null)
+            if (m_Rule == null)
             {
+                Debug.LogError("规则不能为空");
+                return;
+            }
+
+            if (m_DataBuilders == null)
+            {
+                Debug.LogError("数据构建器不能为空");
                 return;
             }
 
