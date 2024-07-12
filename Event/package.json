@@ -1,0 +1,16 @@
+{
+  "name": "com.rcy.gameframework-toolkit-event",
+  "version": "1.0.0",
+  "displayName": "Gameframework Toolkit Event",
+  "description": "游戏开发工具包Event工具",
+  "unity": "2021.1",
+  "dependencies": {},
+  "keywords": [
+    "Toolkit",
+    "Event"
+  ],
+  "author": {
+    "name": "Rcy",
+    "email": "2280465881@qq.com"
+  }
+}
