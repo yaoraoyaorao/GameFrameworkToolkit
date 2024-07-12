@@ -7,13 +7,13 @@ namespace GameFramework.Toolkit.Editor
 {
     public static class TypeUtility
     {
-        private static readonly string[] RuntimeAssemblyNames =
+        public static readonly string[] RuntimeAssemblyNames =
         {
             "GameFramework.Toolkit.Runtime",
             "Assembly-CSharp",
         };
 
-        private static readonly string[] RuntimeOrEditorAssemblyNames =
+        public static readonly string[] RuntimeOrEditorAssemblyNames =
         {
             "GameFramework.Toolkit.Runtime",
             "GameFramework.Toolkit.Editor",
