@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace GameFramework.Toolkit.Runtime
 {
+    [DefaultExecutionOrder(-110)]
     public class EventComponent : MonoBehaviour
     {
         private EventPool<GameEventArgs> m_EventPool;

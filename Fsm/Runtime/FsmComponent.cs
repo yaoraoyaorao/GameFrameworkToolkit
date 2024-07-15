@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace GameFramework.Toolkit.Runtime
 {
+    [DefaultExecutionOrder(-100)]
     public class FsmComponent : MonoBehaviour
     {
         private Dictionary<string, FsmBase> m_Fsms;
@@ -14,7 +15,7 @@ namespace GameFramework.Toolkit.Runtime
             get { return m_Fsms.Count; }
         }
 
-        private void Start()
+        private void Awake()
         {
             m_Fsms = new Dictionary<string, FsmBase>();
             m_TempFsms = new List<FsmBase>();
