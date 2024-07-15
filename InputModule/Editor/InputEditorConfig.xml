@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<InputSetting SaveOnExit="True">
+  <Group Name="Player" CacheName="Player" Enable="True">
+    <Device TypeName="GameFramework.Toolkit.Editor.KeyboardDeviceData" Enable="True" Foldout="True">
+      <Action TypeName="GameFramework.Toolkit.Editor.KeyboardDirLerpData">
+        <Sensitivity>3</Sensitivity>
+        <Decay>2</Decay>
+        <KeyCodes>
+          <Item>119</Item>
+          <Item>97</Item>
+          <Item>115</Item>
+          <Item>100</Item>
+        </KeyCodes>
+        <ActionName>方向-插值</ActionName>
+        <Name>Movement</Name>
+        <Enable>True</Enable>
+      </Action>
+    </Device>
+  </Group>
+</InputSetting>

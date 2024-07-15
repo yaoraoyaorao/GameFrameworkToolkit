@@ -1,0 +1,17 @@
+{
+    "name": "GameFramework.Toolkit.Input.Runtime",
+    "rootNamespace": "GameFramework.Toolkit.Runtime",
+    "references": [
+        "GUID:a804d98b5515b0b4aa50ed77ea17ee23",
+        "GUID:77f3317f37c7ef548b4ab86bff8b1ad5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

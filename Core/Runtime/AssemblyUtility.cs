@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GameFramework.Toolkit.Runtime
 {
@@ -53,6 +54,45 @@ namespace GameFramework.Toolkit.Runtime
             {
                 results.AddRange(assembly.GetTypes());
             }
+        }
+
+        /// <summary>
+        /// 获取所有程序集类型
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetAllAssemblyTypes()
+        {
+            var result = s_Assemblies.SelectMany(t =>
+            {
+                var innerTypes = new Type[0];
+                try
+                {
+                    innerTypes = t.GetTypes();
+                }
+                catch { }
+                return innerTypes;
+            });
+
+            return result;
+        }
+
+        /// <summary>
+        /// 获取派生的所有类型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetAllTypesDerivedFrom<T>()
+        {
+#if UNITY_EDITOR && UNITY_2019_2_OR_NEWER
+            return UnityEditor.TypeCache.GetTypesDerivedFrom<T>();
+#else
+            return GetAllAssemblyTypes().Where(t => t.IsSubclassOf(typeof(T)));
+#endif
+        }
+
+        public static IEnumerable<Type> GetAllTypesDerivedFrom(Type type)
+        {
+            return UnityEditor.TypeCache.GetTypesDerivedFrom(type);
         }
 
         /// <summary>
